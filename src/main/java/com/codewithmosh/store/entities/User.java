@@ -57,4 +57,12 @@ public class User {
         addresses.remove(address);
         address.setUser(null);
     }
+
+    @ManyToMany
+    @JoinTable(
+            name = "wishlist",
+            joinColumns =  @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "product_id")
+    )
+    private Set<Product> wishList = new HashSet<>();
 }
