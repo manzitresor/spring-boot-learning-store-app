@@ -63,9 +63,11 @@ public class UserService {
        var user = userRepository.findById(3L).orElseThrow();
        var products = productRepository.findAll();
 
-       products.forEach(product -> {
-           user.addFavoriteProduct(product);
-       });
+       products.forEach(user::addFavoriteProduct);
     }
 
+    @Transactional
+    public void updateProductPrices(){
+        productRepository.updatePriceByCategory(BigDecimal.valueOf(10), (byte)10);
+    }
 }
