@@ -70,4 +70,10 @@ public class UserService {
     public void updateProductPrices(){
         productRepository.updatePriceByCategory(BigDecimal.valueOf(10), (byte)10);
     }
+
+    @Transactional
+    public void fetchProducts(){
+        var products = productRepository.findByCategory(new Category((byte)1));
+        products.forEach(System.out::println);
+    }
 }
