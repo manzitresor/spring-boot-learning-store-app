@@ -2,16 +2,13 @@ package com.codewithmosh.store.entities;
 
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.math.BigDecimal;
 
 @Setter
 @Getter
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
@@ -26,10 +23,13 @@ public class Product {
     @Column(name = "name")
     private String name;
 
-    @Column(name = "price")
-    private double price;
+    @Column(name = "description")
+    private String description;
 
-    @ManyToOne()
+    @Column(name = "price")
+    private BigDecimal price;
+
+    @ManyToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "category_id")
     private Category category;
 }
