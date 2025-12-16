@@ -9,8 +9,6 @@ public class StoreApplication {
 
 	public static void main(String[] args) {
 	    ApplicationContext context =SpringApplication.run(StoreApplication.class, args);
-        var userService = context.getBean(UserService.class);
-        userService.fetchProducts();
 	}
 
 }

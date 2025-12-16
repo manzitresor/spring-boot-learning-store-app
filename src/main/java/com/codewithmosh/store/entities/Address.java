@@ -3,7 +3,6 @@ package com.codewithmosh.store.entities;
 import jakarta.persistence.*;
 import lombok.*;
 
-
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
