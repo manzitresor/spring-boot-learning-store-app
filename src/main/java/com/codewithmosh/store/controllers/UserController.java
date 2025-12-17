@@ -1,10 +1,12 @@
 package com.codewithmosh.store.controllers;
 
+import com.codewithmosh.store.dtos.UserDto;
 import com.codewithmosh.store.entities.User;
 import com.codewithmosh.store.repositories.UserRepository;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -21,12 +23,19 @@ public class UserController {
    private final UserRepository userRepository;
 
    @GetMapping
-    public Iterable<User> getUsers() {
-        return  userRepository.findAll();
+    public List<UserDto> getUsers() {
+       return userRepository.findAll().stream()
+               .map( user -> new UserDto(user.getId(),user.getName(),user.getEmail()))
+               .toList();
     }
 
     @GetMapping("/{id}")
-    public User getUser(@PathVariable long id) {
-       return userRepository.findById(id).orElse(null);
+    public ResponseEntity<UserDto> getUser(@PathVariable long id) {
+       var user = userRepository.findById(id).orElse(null);
+       if (user == null) {
+           return ResponseEntity.notFound().build();
+       }
+       var userDto = new UserDto(user.getId(),user.getName(),user.getEmail());
+       return ResponseEntity.ok(userDto);
     }
 }
