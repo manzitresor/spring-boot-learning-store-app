@@ -38,4 +38,12 @@ public class ProductController {
         return ResponseEntity.ok(productWrapper.toDto(product));
     }
 
+    @PostMapping
+    public ResponseEntity<ProductDto> createProduct(@RequestBody ProductDto productDto){
+        var product = productWrapper.toEntity(productDto);
+        productRepository.save(product);
+        productDto.setId(product.getId());
+        return ResponseEntity.ok(productWrapper.toDto(product));
+    }
+
 }
