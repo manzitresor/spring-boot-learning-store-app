@@ -19,9 +19,7 @@ public class ProductController {
     private ProductWrapper productWrapper;
 
     @GetMapping
-    public List<ProductDto> getAllProducts(
-            @RequestParam(name = "categoryId", required = false, defaultValue = "") Byte categoryId
-    ){
+    public List<ProductDto> getAllProducts(@RequestParam(name = "categoryId", required = false, defaultValue = "") Byte categoryId){
         List<Product> products;
         if(categoryId != null) {
             products = productRepository.findByCategoryId(categoryId);
