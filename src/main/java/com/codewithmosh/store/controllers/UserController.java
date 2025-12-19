@@ -53,10 +53,11 @@ public class UserController {
     }
 
     @PostMapping
-    public ResponseEntity<UserDto> createUser(
-            @Valid @RequestBody RegisterUserRequest request,
-            UriComponentsBuilder uriBuilder
-    ) {
+    public ResponseEntity<?> registerUser(@Valid @RequestBody RegisterUserRequest request, UriComponentsBuilder uriBuilder){
+        if(userRepository.existsByEmail(request.getEmail())){
+            return ResponseEntity.badRequest().body(Map.of("message", "email already exists"));
+        }
+
         var user = userMapper.toEntity(request);
         userRepository.save(user);
         var userDto = userMapper.toDto(user);
@@ -91,7 +92,7 @@ public class UserController {
         if (user == null) {
             return ResponseEntity.notFound().build();
         }
-        if(!user.getPassword().equals(request.getOldPassword())) {
+        if (!user.getPassword().equals(request.getOldPassword())) {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
         user.setPassword(request.getNewPassword());
