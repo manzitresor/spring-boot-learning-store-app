@@ -12,6 +12,7 @@ import com.codewithmosh.store.mappers.CartMapper;
 import com.codewithmosh.store.repositories.CartRepository;
 import com.codewithmosh.store.repositories.ProductRepository;
 import com.codewithmosh.store.services.CartService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -27,6 +28,7 @@ import java.util.UUID;
 @RequestMapping("/carts")
 @AllArgsConstructor
 @Data
+@Tag(name = "Carts")
 public class CartController {
     private final CartRepository cartRepository;
     private final CartMapper cartMapper;
