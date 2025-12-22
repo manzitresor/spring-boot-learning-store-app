@@ -61,4 +61,8 @@ public class Cart {
         }
     }
 
+    public void clearCart() {
+        items.clear();
+    }
+
 }
