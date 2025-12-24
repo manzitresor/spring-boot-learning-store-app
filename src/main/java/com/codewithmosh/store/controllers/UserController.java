@@ -15,6 +15,7 @@ import lombok.NoArgsConstructor;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -30,10 +31,11 @@ import java.util.Set;
 @Data
 @RestController
 @RequestMapping("/users")
-@Tag(name="Users")
+@Tag(name = "Users")
 public class UserController {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
+    private final PasswordEncoder passwordEncoder;
 
     @GetMapping
     public List<UserDto> getAllUsers(@RequestParam(required = false, defaultValue = "", name = "sort") String sort) {
@@ -55,12 +57,13 @@ public class UserController {
     }
 
     @PostMapping
-    public ResponseEntity<?> registerUser(@Valid @RequestBody RegisterUserRequest request, UriComponentsBuilder uriBuilder){
-        if(userRepository.existsByEmail(request.getEmail())){
+    public ResponseEntity<?> registerUser(@Valid @RequestBody RegisterUserRequest request, UriComponentsBuilder uriBuilder) {
+        if (userRepository.existsByEmail(request.getEmail())) {
             return ResponseEntity.badRequest().body(Map.of("message", "email already exists"));
         }
 
         var user = userMapper.toEntity(request);
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
         userRepository.save(user);
         var userDto = userMapper.toDto(user);
         var uri = uriBuilder.path("/users/{id}").buildAndExpand(userDto.getId()).toUri();
