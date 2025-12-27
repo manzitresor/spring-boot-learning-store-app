@@ -1,6 +1,5 @@
 package com.codewithmosh.store.entities;
 
-
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -9,21 +8,20 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-@Getter
 @Setter
-@Builder
+@Getter
 @AllArgsConstructor
-@Entity
-@ToString
-@Table(name = "users")
 @NoArgsConstructor
+@Builder
+@Entity
+@Table(name = "users")
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column( name = " id")
+    @Column(name = "id")
     private Long id;
 
-    @Column( name = "name")
+    @Column(name = "name")
     private String name;
 
     @Column(name = "email")
@@ -32,21 +30,9 @@ public class User {
     @Column(name = "password")
     private String password;
 
-    @ManyToMany
-    @JoinTable(
-            name = "user_tags",
-            joinColumns =  @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "tag_id")
-    )
-    private Set<Tag> tags = new HashSet<>();
-
-    @OneToOne(mappedBy = "user", cascade = CascadeType.REMOVE)
-    private Profile profile;
-
     @OneToMany(mappedBy = "user", cascade = {CascadeType.PERSIST, CascadeType.REMOVE}, orphanRemoval = true)
     @Builder.Default
-    private List<Address>  addresses = new ArrayList<>();
-
+    private List<Address> addresses = new ArrayList<>();
 
     public void addAddress(Address address) {
         addresses.add(address);
@@ -58,15 +44,26 @@ public class User {
         address.setUser(null);
     }
 
+    @OneToOne(mappedBy = "user", cascade = CascadeType.REMOVE)
+    private Profile profile;
+
     @ManyToMany
     @JoinTable(
             name = "wishlist",
-            joinColumns =  @JoinColumn(name = "user_id"),
+            joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "product_id")
     )
-    private Set<Product> wishList = new HashSet<>();
+    private Set<Product> favoriteProducts = new HashSet<>();
 
     public void addFavoriteProduct(Product product) {
-        wishList.add(product);
+        favoriteProducts.add(product);
+    }
+
+    @Override
+    public String toString() {
+        return getClass().getSimpleName() + "(" +
+                "id = " + id + ", " +
+                "name = " + name + ", " +
+                "email = " + email + ")";
     }
 }
