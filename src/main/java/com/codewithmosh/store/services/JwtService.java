@@ -1,6 +1,7 @@
 package com.codewithmosh.store.services;
 
 
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import lombok.AllArgsConstructor;
@@ -23,5 +24,19 @@ public class JwtService {
                 .expiration(new Date(System.currentTimeMillis() + 1000 * expiration))
                 .signWith(Keys.hmacShaKeyFor(secret.getBytes()))
                 .compact();
+    }
+
+    public boolean validateToken(String token) {
+        try{
+            var claims = Jwts.parser()
+                    .verifyWith(Keys.hmacShaKeyFor(secret.getBytes()))
+                    .build()
+                    .parseSignedClaims(token)
+                    .getPayload();
+            return claims.getExpiration().after(new Date());
+        } catch (ExpiredJwtException e) {
+            return false;
+        }
+
     }
 }
