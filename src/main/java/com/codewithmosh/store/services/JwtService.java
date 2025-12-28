@@ -2,6 +2,7 @@ package com.codewithmosh.store.services;
 
 
 import com.codewithmosh.store.config.JwtConfig;
+import com.codewithmosh.store.entities.Role;
 import com.codewithmosh.store.entities.User;
 import com.codewithmosh.store.repositories.UserRepository;
 import io.jsonwebtoken.Claims;
@@ -60,4 +61,9 @@ public class JwtService {
     public Long getIdFromToken(String token) {
         return Long.valueOf(getClaims(token).getSubject());
     }
+
+    public Role getRoleFromToken(String token) {
+        return Role.valueOf(getClaims(token).get("role", String.class));
+    }
+
 }
