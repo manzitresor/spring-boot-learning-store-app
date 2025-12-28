@@ -24,7 +24,6 @@ public class JwtService {
     }
 
     public String generateRefreshToken(User user) {
-        final long expiration = 604800; // 7days
         return generateToken(user, jwtConfig.getRefreshTokenExpiration());
     }
 
@@ -33,6 +32,7 @@ public class JwtService {
                 .subject(user.getId().toString())
                 .claim("email", user.getEmail())
                 .claim("name", user.getName())
+                .claim("role", user.getRole().toString())
                 .issuedAt(new Date())
                 .expiration(new Date(System.currentTimeMillis() + 1000 * expiration))
                 .signWith(jwtConfig.getSecretKey())

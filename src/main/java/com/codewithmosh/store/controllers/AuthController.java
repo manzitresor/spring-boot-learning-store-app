@@ -1,6 +1,7 @@
 package com.codewithmosh.store.controllers;
 
 
+import com.codewithmosh.store.config.JwtConfig;
 import com.codewithmosh.store.dtos.JwtResponse;
 import com.codewithmosh.store.dtos.LoginDto;
 import com.codewithmosh.store.dtos.UserDto;
@@ -26,6 +27,7 @@ public class AuthController {
     private final JwtService jwtService;
     private final UserRepository userRepository;
     private final UserMapper userMapper;
+    private final JwtConfig jwtConfig;
 
     @PostMapping("/login")
     public ResponseEntity<JwtResponse> login(@RequestBody LoginDto request, HttpServletResponse response) {
@@ -33,26 +35,32 @@ public class AuthController {
                 .authenticate(
                         new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
                 );
-        var user =  userRepository.findByEmail(request.getEmail()).orElseThrow() ;
 
+        var user = userRepository.findByEmail(request.getEmail()).orElseThrow();
         var accessToken = jwtService.generateAccessToken(user);
+
         var refreshToken = jwtService.generateRefreshToken(user);
-        var cookie = new Cookie("refreshToken",refreshToken);
+        var cookie = new Cookie("refreshToken", refreshToken);
         cookie.setHttpOnly(true);
         cookie.setPath("/auth/refresh");
-        cookie.setMaxAge(604800);
+        cookie.setMaxAge(jwtConfig.getRefreshTokenExpiration());
         cookie.setSecure(true);
-
         response.addCookie(cookie);
 
         return ResponseEntity.ok(new JwtResponse(accessToken));
     }
 
-    @PostMapping("/validate")
-    public boolean validate(@RequestHeader("Authorization") String header) {
-        System.out.println("Validate controller called");
-        String token = header.replace("Bearer ", "");
-        return jwtService.validateToken(token);
+    @PostMapping("/refresh")
+    public ResponseEntity<JwtResponse> refreshToken(@RequestHeader("refreshToken") String refreshToken) {
+        if(!jwtService.validateToken(refreshToken)){
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        var userId = jwtService.getIdFromToken(refreshToken);
+        var user = userRepository.findById(userId).orElseThrow();
+        var accessToken = jwtService.generateAccessToken(user);
+
+        return ResponseEntity.ok(new JwtResponse(accessToken));
     }
 
     @GetMapping("/me")
@@ -61,7 +69,7 @@ public class AuthController {
         Long userId = (Long) authentication.getPrincipal();
 
         var user = userRepository.findById(userId).orElse(null);
-        if(user == null) {
+        if (user == null) {
             return ResponseEntity.notFound().build();
         }
 
