@@ -14,7 +14,7 @@ import java.util.Date;
 @Data
 public class Jwt {
     private final Claims claims;
-    private final SecretKey key;
+    private final SecretKey secretKey;
 
     public Boolean isExpired() {
         return claims.getExpiration().before(new Date());
@@ -29,6 +29,6 @@ public class Jwt {
     }
 
     public String toString(){
-        return Jwts.builder().claims(claims).compact();
+        return Jwts.builder().claims(claims).signWith(secretKey).compact();
     }
 }
